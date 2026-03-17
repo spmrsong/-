@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전월세 체크리스트</title>
+
+<style>
+body{
+  font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;
+  background:linear-gradient(135deg,#ffe6f0,#e6f7ff);
+  margin:0;
+  padding:20px;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+  background:white;
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+h1{text-align:center;font-size:22px;}
+.sub{text-align:center;font-size:14px;color:#666;margin-bottom:20px;}
+
+.progress-wrap{background:#eee;border-radius:20px;height:14px;overflow:hidden;}
+.progress{height:100%;width:0%;background:linear-gradient(90deg,#ff7eb3,#7ecbff);transition:0.4s;}
+
+.status{text-align:center;margin:10px 0 10px;font-weight:bold;}
+.score{text-align:center;font-size:13px;color:#888;margin-bottom:15px;}
+
+.item{
+  display:flex;gap:12px;padding:15px;border-radius:15px;margin-bottom:12px;
+  background:#fafafa;border:1px solid #eee;cursor:pointer;transition:0.2s;
+}
+.item:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.05);}
+
+.item input{transform:scale(1.4);margin-top:4px;accent-color:#ff7eb3;}
+
+.item.checked{background:#fff0f6;opacity:0.7;}
+.title{font-weight:bold;margin-bottom:5px;}
+.desc{font-size:13px;color:#666;line-height:1.5;}
+
+.item.checked .title,.item.checked .desc{text-decoration:line-through;}
+
+.badge{font-size:11px;padding:3px 8px;border-radius:10px;margin-left:5px;}
+.safe{background:#e0f7fa;color:#00796b;}
+.warn{background:#fff3e0;color:#e65100;}
+.danger{background:#ffebee;color:#c62828;}
+
+.tip{
+  margin-top:20px;padding:15px;border-radius:12px;background:#f1f9ff;font-size:13px;
+}
+
+.buttons{
+  display:flex;gap:10px;margin-top:15px;
+}
+
+button{
+  flex:1;padding:10px;border:none;border-radius:10px;cursor:pointer;
+  background:linear-gradient(90deg,#ff7eb3,#7ecbff);color:white;font-weight:bold;
+}
+
+button.secondary{
+  background:#eee;color:#555;
+}
+
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🏠 전월세 계약 체크리스트</h1>
+<div class="sub">사회초년생 필수 체크 7단계</div>
+
+<div class="progress-wrap"><div class="progress" id="bar"></div></div>
+<div class="status" id="status">0 / 7 완료</div>
+<div class="score" id="score">안전 점수: 0점</div>
+
+<label class="item" onclick="update()">
+<input type="checkbox">
+<div>
+<div class="title">1. 공인중개사 확인 <span class="badge safe">기본</span></div>
+<div class="desc">자격증 / 공제증서 있는지 확인 (요청 후 없으면 바로 나오기)</div>
+</div>
+</label>
+
+<label class="item" onclick="update()">
+<input type="checkbox">
+<div>
+<div class="title">2. 임대인 신분 확인 <span class="badge safe">필수</span></div>
+<div class="desc">등기부등본 소유자랑 신분증 이름 동일한지 반드시 체크</div>
+</div>
+</label>
+
+<label class="item" onclick="update()">
+<input type="checkbox">
+<div>
+<div class="title">3. 등기부등본 <span class="badge danger">핵심</span></div>
+<div class="desc">근저당 많으면 위험 / 가압류·신탁 있으면 계약 X</div>
+</div>
+</label>
+
+<label class="item" onclick="update()">
+<input type="checkbox">
+<div>
+<div class="title">4. 건축물대장 <span class="badge warn">주의</span></div>
+<div class="desc">위반건축물 = 대출, 보증보험 불가</div>
+</div>
+</label>
+
+<label class="item" onclick="update()">
+<input type="checkbox">
+<div>
+<div class="title">5. 납세증명서 <span class="badge warn">주의</span></div>
+<div class="desc">세금 체납 많으면 경매 위험</div>
+</div>
+</label>
+
+<label class="item" onclick="update()">
+<input type="checkbox">
+<div>
+<div class="title">6. 대출 / 보증보험 <span class="badge safe">확인</span></div>
+<div class="desc">계약 전 반드시 가능 여부 체크</div>
+</div>
+</label>
+
+<label class="item" onclick="update()">
+<input type="checkbox">
+<div>
+<div class="title">7. 소액임차인 <span class="badge danger">중요</span></div>
+<div class="desc">최초 근저당 기준 + 최우선변제대상 확인<br>⚠️후순위 임차인일 때만 해당<br>👉 “이걸로 안전 확보” ❌<br>👉 “이건 최악 대비용” ⭕</div>
+</div>
+</label>
+
+<div class="buttons">
+<button onclick="share()">📤 공유하기</button>
+<button class="secondary" onclick="resetAll()">초기화</button>
+</div>
+
+<div class="tip">
+💡 TIP<br>
+보증금은 가능하면 "최우선변제 금액 이하"로 맞추면 최악의 경우에도 안전성이 높아요.
+<br>(단, 다가구 주택은 선순위 임차인 많으면 위험)
+</div>
+
+</div>
+
+<script>
+const KEY='checklist_save';
+
+function update(){
+  const cbs=document.querySelectorAll('input');
+  const items=document.querySelectorAll('.item');
+  let count=0;
+
+  let save=[];
+
+  cbs.forEach((cb,i)=>{
+    save.push(cb.checked);
+    if(cb.checked){count++;items[i].classList.add('checked');}
+    else{items[i].classList.remove('checked');}
+  });
+
+  localStorage.setItem(KEY,JSON.stringify(save));
+
+  document.getElementById('bar').style.width=(count/6*100)+'%';
+  let score = count === 7 ? 100 : count * 16.5;
+  document.getElementById('score').innerText='안전 점수: '+score+'점';
+
+   if(count===7){
+    document.getElementById('status').innerText='🎉 대비까지 완료!';
+    document.getElementById('status').style.color = '#e91e63';
+  }else if(count===6){
+    document.getElementById('status').innerText='🎉 완벽합니다! 안전한 계약을 진행하세요!';
+    document.getElementById('status').style.color = '#e91e63';
+  }else{
+    document.getElementById('status').innerText=count + ' / 7 완료';
+    document.getElementById('status').style.color = '#4caf50';
+  }
+}
+
+function load(){
+  const data=JSON.parse(localStorage.getItem(KEY));
+  if(!data) return;
+  const cbs=document.querySelectorAll('input');
+  data.forEach((v,i)=>{cbs[i].checked=v});
+  update();
+}
+
+function resetAll(){
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+function share(){
+  alert('블로그나 카톡에 링크 공유하면 됩니다 👍');
+}
+
+window.onload=load;
+</script>
+
+</body>
+</html>
